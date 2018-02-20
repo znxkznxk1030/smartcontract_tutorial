@@ -10,7 +10,6 @@ if (typeof web3 !== 'undefined') {
 }
 
 var isConnected = function () {
-
 	return web3.currentProvider.connected;
 }
 

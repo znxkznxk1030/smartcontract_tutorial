@@ -29,12 +29,15 @@ let ContractSimpleStorage = new web3.eth.Contract(abi, {
 });
 
 ContractSimpleStorage.deploy({
-	data:ContractSimpleStorage.options.data
+})
+.send({
+	from : web3.eth.coinbase
+})
+.then(function (newContractInstance) {
+	console.log(newContractInstance);
 });
 
-console.log(ContractSimpleStorage.options);
 
-console.log(ContractSimpleStorage.options.address);
 
 
 /*
