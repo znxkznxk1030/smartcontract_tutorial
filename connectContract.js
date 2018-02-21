@@ -15,12 +15,15 @@ web3.eth.getAccounts(function (err, accounts) {
 
 //	web3.eth.personal.unlockAccount(ownAccount,'ysKim', 100)
 //	.then(function (response) {
+
 		let input = fs.readFileSync('./contracts/simpleStorage.sol');
 		let output = solc.compile(input.toString(), 1);
 
 		let bytecode = output.contracts[':SimpleStorage'].bytecode;
 		let abi = output.contracts[':SimpleStorage'].interface;
 		let Contract = new web3.eth.Contract(JSON.parse(abi), ownAccount);
+
+
 
 		Contract.deploy({
 		        data:'0x' + bytecode,
@@ -31,7 +34,7 @@ web3.eth.getAccounts(function (err, accounts) {
 		   	gasPrice: '30000000000000'
 	   	})
 		.on('error', function (error) {
-                        console.log('error : ' + error);
+                        console.log(error);
                 })
                 .on('transactionHash', function (transaction) {
                         console.log('transactionHash : ' + transaction);
@@ -40,7 +43,7 @@ web3.eth.getAccounts(function (err, accounts) {
                         console.log('number : ' + number + '\nreceipt : ' + receipt);
                 })
 	   	.then(function (ContractInstance) {
-			console.log('HEllo!');
+		
 			ContractInstance.methods.set(123).send({from: ownAccount})
 			.then(function () {
 				ContractInstance.methods.get().call({from: ownAccount})
@@ -60,9 +63,10 @@ web3.eth.getAccounts(function (err, accounts) {
                                 	console.log('3. ret : ' + ret);
                         	});
 			}, 1000);
+			
 	   	})
 		.catch(function (error) {
-		});	
+		});
 //	})
 //	.catch(function (error) {
 //		console.log(error);	
