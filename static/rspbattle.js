@@ -14,9 +14,7 @@ function startRspGame() {
 		.then(console.log);
 }
 
-function getGameState() {
-	gameId = $("#gameId").val() | 0;
-
+function getGameState(gameId) {
 	contractInstance.methods.getGameState(gameId).call({from: accounts[selectedAccount]})
 	.then(function(gameState) {
 		console.log(gameState);
@@ -24,18 +22,77 @@ function getGameState() {
 	
 }
 
-function getGameInfo(i) {
+function getWinner(gameId, cb){
+	contractInstance.methods.getWinner(gameId).call({from: accounts[selectedAccount]})
+	.then(function(address){
+		console.log(address);
+		cb(address, gameId);
+	});
+}
+
+function getGameInfo() {
 	contractInstance.methods.games(i).send({from: accounts[selectedAccount]})
 	.then(console.log);
 }
 
-function beats(i) {
-	gameId = $("#gameId").val() | 0;
-	type = $("type").val() | 1;
-
+function beats(gameId, type) {
 	contractInstance.methods.beats(gameId, type).send({
-			from: accounts[i]})
+			from: accounts[selectedAccount]})
 	.then(console.log);
+}
+
+function getPlayingGames(){
+	$('#games-list').empty();
+	contractInstance.methods.getPlayingGames(accounts[selectedAccount]).call({from:accounts[selectedAccount]})
+	.then(function(games) {
+		console.log(games);
+		for(let i = 0; i < games.length; i++) {
+			(function(){
+				let gameId = games[i];
+				$('#games-list').append(
+				`<div class="item" id="game_${gameId}">
+				    <i class="large chess rock middle aligned icon"></i>
+				    <div class="content">
+				      <a class="header" >id : ${gameId}</a>
+				      <div class="description" id="state_${gameId}"></div>
+				    </div>
+				  </div>`
+				);
+				console.log(gameId);
+			 	getWinner(gameId, function(result, game_id){
+					console.log(game_id);
+					console.log(gameId);
+					let isFinished = result[0];
+					let winner = result[1];
+					$('#state_' + game_id).empty();
+					if(!isFinished){
+						state = 'playing';
+						$('#game_' + game_id).append(`
+							<button class="ui icon button" onclick="beats(${game_id}, 1)">
+							  <i class="hand rock outline icon"></i>
+							</button>
+							<button class="ui icon button" onclick="beats(${game_id}, 3)">
+							  <i class="hand scissors outline icon"></i>
+							</button>
+							<button class="ui icon button" onclick="beats(${game_id}, 2)">
+							  <i class="hand paper outline icon"></i>
+							</button>
+						`);
+					} else if (winner === '0x0000000000000000000000000000000000000000'){
+						state = 'draw';
+					} else if (winner === accounts[selectedAccount]){
+						state = 'win';	
+					} else {
+						state = 'lose';	
+					}
+	
+					$('#state_' + gameId).append(state);
+				});
+
+			})();
+		}
+			
+	});
 }
 
 function displaySeletedAddress() {
@@ -60,7 +117,7 @@ $(document).ready(function() {
 			let account = _accounts[i];
 
 
-			$(".list").append(
+			$("#accounts-list").append(
 			`<div class="item">
 			    <i class="large address card outline middle aligned icon"></i>
 			    <div class="content">
@@ -75,6 +132,7 @@ $(document).ready(function() {
 				console.log(i);
 				if(toggleAccount) {
 					selectedAccount = i;
+					getPlayingGames();
 				}
 				else{
 					targetAccount = i;
