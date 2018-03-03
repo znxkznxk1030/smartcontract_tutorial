@@ -35,7 +35,7 @@ web3.eth.getAccounts(function (err, accounts) {
 	})
 	.send({
 	   	from: ownAccount,
-		gas: 3000000,
+		gas: 1000000,
 		gasPrice: '30000000000000',
    	})
 	.on('error', function (error) {
@@ -61,7 +61,7 @@ web3.eth.getAccounts(function (err, accounts) {
 			try {
 				fileContents = fs.readFileSync(__dirname + req.url, 'utf8');
 			} catch (e) {
-				fileContents = fs.readFileSync(__dirname + '/static/index.html', 'utf8');
+				fileContents = fs.readFileSync(__dirname + '/static/rsp.html', 'utf8');
 			}
 
 			
