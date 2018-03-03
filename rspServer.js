@@ -9,7 +9,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 // Compile the source code
 web3.eth.getAccounts(function (err, accounts) {
 
-	if (err) { return;}
+	if (err) {console.log(err); return ;}
 
 	console.log(accounts);
 

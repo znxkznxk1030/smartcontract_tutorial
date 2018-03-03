@@ -18,6 +18,7 @@ contract RSPBattle {
     
     Game[] public games;
     mapping (uint => address) winner;
+    mapping (address => uint) playingGameCount;
     
     modifier isNotMe (address _address) {
         require(_address != msg.sender);
@@ -32,6 +33,8 @@ contract RSPBattle {
     function startGame(address _opposite) public isNotMe(_opposite) returns (uint8 []) {
         uint id = games.push(Game(msg.sender, _opposite, new uint8[](2), false)) - 1;
         NewGame(id, msg.sender, _opposite);
+        playingGameCount[msg.sender]++;
+        playingGameCount[_opposite]++;
         return (games[id].rsptypes);
     }
     
@@ -73,11 +76,24 @@ contract RSPBattle {
     
     function getGameState(uint gameId) public view validGame (gameId) returns (uint8 []) {
         Game storage game = games[gameId];
-        return game.rsptypes;
+        return (game.rsptypes);
     }
     
-    function getWinner(uint gameId) public view validGame(gameId) returns (address) {
-        return winner[gameId];
+    function getPlayingGames(address owner) public view returns(uint[]){
+        uint[] memory result = new uint[](playingGameCount[owner]);
+        uint counter = 0;
+        for (uint i = 0; i < games.length; i++) {
+            if (games[i].challenger == owner || games[i].opposite == owner)
+            {
+                result[counter++] = i;
+            }
+        }
+        
+        return result;
+    }
+    
+    function getWinner(uint gameId) public view validGame(gameId) returns (bool, address) {
+        return (games[gameId].isFinished, winner[gameId]);
     }
     
 }
