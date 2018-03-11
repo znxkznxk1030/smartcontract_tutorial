@@ -51,19 +51,6 @@ web3.eth.getAccounts(function (err, accounts) {
 			console.log('hello!');
 
 			deployedContract = ContractInstance;
-
-			ContractInstance.methods.voteForCandidate(asciiToHex('Rama')).send({from:ownAccount})
-			.then(function () {
-				ContractInstance.methods.totalVotesFor(asciiToHex('Rama')).call({from:ownAccount})
-                        	.then(function (ret) {
-                                	console.log(ret);
-					console.log('뭐라로 찍혀라');
-                        	});	
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-
 	   	})
 		.then(function () {
 			const server = http.createServer(function (req, res) {
